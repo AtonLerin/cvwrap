@@ -17,6 +17,9 @@ def create_menuitems():
     if MENU_ITEMS:
         # Already created
         return
+    if int(cmds.about(v=True)) < 2016:
+        cmds.warning('cvWrap menus only available in Maya 2016 and higher.')
+        return
     for menu in ['mainDeformMenu', 'mainRigDeformationsMenu']:
         # Make sure the menu widgets exist first.
         mel.eval('ChaDeformationsMenu MayaWindow|{0};'.format(menu))
@@ -232,8 +235,7 @@ def paint_cvwrap_weights(*args, **kwargs):
     """Activates the paint cvWrap weights context."""
     sel = cmds.ls(sl=True)
     if sel:
-        wrap_nodes = [node for node in cmds.listHistory(sel[0], pdo=True)
-                     if cmds.nodeType(node) == 'cvWrap']
-        if wrap_nodes:
+        wrap_node = get_wrap_node_from_selected()
+        if wrap_node:
             mel.eval('artSetToolAndSelectAttr("artAttrCtx", "cvWrap.{0}.weights");'.format(
-                     wrap_nodes[0]))
+                     wrap_node))
